@@ -20,6 +20,8 @@ Note this implies that they should not be publicly accessible without protection
 * Lambda function - [https://aws.amazon.com/lambda/pricing/](https://aws.amazon.com/lambda/pricing/)
 * SNS topic - [https://aws.amazon.com/sns/pricing/](https://aws.amazon.com/sns/pricing/)
 
+This assumes that the roles *lambda_basic_execution* and *service-role/StatesExecutionRole-us-east-1* already exist in your account.
+
 ## Usage
 
 A single CloudFormation stack is used to create all of the resources needed
@@ -35,6 +37,8 @@ reminder messages are sent.
 Create the CloudFormation stack and AWS resources:
     make -e EMAIL=email@example.com create-cf
 
+Note, you may need to confirm the subscription created to the new SNS topic.
+That is required for sending reminders to work as expected.
 
 Create a reminder as a test:
     make run-cf

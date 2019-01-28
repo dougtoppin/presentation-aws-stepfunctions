@@ -39,6 +39,8 @@ that each perform a discrete function lets you scale and change applications qui
 
 ### Try it
 
+Follow the README.md to try creating this in your account.
+
 [https://github.com/dougtoppin/presentation-aws-stepfunctions](https://github.com/dougtoppin/presentation-aws-stepfunctions)
 
 ---
@@ -133,6 +135,8 @@ Once created, Step function executions can be started using the  AWS console, CL
 
 Example: Reminder service
 
+This is a Lambda function that a Step function can use to send to an SNS topic.
+
 Lambda Python Function
 ```
 import json
@@ -161,6 +165,8 @@ def lambda_handler(event, context):
 
 +++
 
+Instead of using a Lambda function, have Step directly send to the topic.
+
 Step Function with SNS integration
 ```
 {
@@ -183,30 +189,6 @@ Step Function with SNS integration
 
 ```
 
-+++
-
-Reminder service using SNS integration
-
-+++
-
-cli invocation
-
-Example timestamp, note timezone of Z: 2018-04-24T17:45:00Z
-
-ARN is the arn of the Step Function (pulled from the Parameter Store)
-
-```
-aws stepfunctions start-execution --state-machine-arn $ARN --input "{ \"timestamp\": \"$TS\", \"message\":\"$MESSAGE\" }"
-```
-
-Example:
-
-```
-
-remindme.sh "remind me of something" "2019-01-27 09:00:00"
-
-
-```
 ---
 
 ### Lessons learned
