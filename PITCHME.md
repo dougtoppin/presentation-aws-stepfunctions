@@ -9,6 +9,7 @@
 
 - What are AWS Step Functions
 - Why use it
+- Try it
 - Related tools
 - Where did it help me
 - Syntax
@@ -36,6 +37,9 @@ that each perform a discrete function lets you scale and change applications qui
 
 +++
 
+### Try it
+
+[https://github.com/dougtoppin/presentation-aws-stepfunctions](https://github.com/dougtoppin/presentation-aws-stepfunctions)
 
 ---
 ### Related orchestration tools

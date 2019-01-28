@@ -70,7 +70,7 @@ The Makefile *validate* command uses *cloudformation validate* and
 Validation can be helpful in finding errors in the template more quickly
 than waiting for CloudFormation to encounter and report them.
 
-Install *cfn-lint* as follows usint a virtual environment and then use validate.
+Install *cfn-lint* as follows using a virtual environment and then use validate.
 
 ```
 
