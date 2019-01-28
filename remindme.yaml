@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Create a reminder service based on AWS Step Functions
+
+
+Parameters:
+  EMAIL:
+    Type: String
+
+Resources:
+
+  # sns topic for notifications
+  SNSTOPIC:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Ref "AWS::StackName"
+      DisplayName: !Ref "AWS::StackName"
+      Subscription:
+        - Endpoint: !Ref EMAIL
+          Protocol: "email"
+
+
+  # lambda function for converting date
+  LAMBDA:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Code:
+        ZipFile: |
+          import sys
+          import time
+          import logging
+
+
+          # convert a local time date time string into a UTC date time string
+          # step functions require a UTC date
+
+
+          # Input example: '2018-04-27 05:04:00'
+
+          # example request payload {"timestamp": "2019-01-19 09:00:00"}
+          #       response content: {"timestamp": "2019-01-19T09:00:00Z"}
+
+
+          def lambda_handler(event, context):
+              logger = logging.getLogger()
+              logger.setLevel(logging.INFO)
+
+              logger.info('convdate:start:{}'.format(event))
+
+              outtime = event['timestamp'] + ""
+
+              # replace the incoming timestamp value with the outgoing reformatted timestamp
+              event['timestamp'] = time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                                 time.gmtime(time.mktime(time.strptime(outtime, "%Y-%m-%d %H:%M:%S"))))
+
+              logger.info('convdate:finish:{}'.format(event))
+
+              return event
+
+      Description: >
+        Lambda function to reformat a provided data argument into  what is expected by the Step Function Wait state
+      FunctionName: !Ref "AWS::StackName"
+      Handler: "lambda_handler"
+      Runtime: "python3.6"
+      Role: !Sub arn:aws:iam::${AWS::AccountId}:role/lambda_basic_execution
+
+
+  # step function for the reminder service
+
+
+  STEP:
+    Type: "AWS::StepFunctions::StateMachine"
+    Properties:
+      StateMachineName: !Ref "AWS::StackName"
+      DefinitionString: !Sub  |
+        {
+          "Comment": "Use SNS to remind me of something",
+          "StartAt": "convdate",
+          "States": {
+            "convdate": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-east-1:${AWS::AccountId}:function:convdate",
+              "Next": "wait_using_timestamp"
+            },
+            "wait_using_timestamp": {
+              "Type": "Wait",
+              "TimestampPath": "$.timestamp",
+              "Next": "Amazon SNS: Publish a message"
+            },
+            "Amazon SNS: Publish a message": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::sns:publish",
+              "Parameters": {
+                "Message.$": "$.message",
+                "TopicArn": "${SNSTOPIC}"
+              },
+              "End": true
+            }
+          }
+        }
+      RoleArn: !Sub arn:aws:iam::${AWS::AccountId}:role/service-role/StatesExecutionRole-us-east-1
+
+Outputs:
+
+  STEPARN:
+    Description: ARN of step function
+    Value: !Ref STEP
+    Export:
+      Name: !Sub "${AWS::StackName}-steparn"
