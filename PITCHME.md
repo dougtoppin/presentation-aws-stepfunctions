@@ -56,6 +56,9 @@ note the difference between "automation and orchestration"
 +++
 
 * no blocked foreground shell
+* orchestration to enable more microservice services patterns
+
++++
 
 ### How might it help you
 
@@ -111,10 +114,6 @@ Once created, Step function executions can be started using the  AWS console, CL
 * create CloudFormation stack
 * reminder service using Lambda
 * reminder service using Step/SNS integration
-
----
-
-#### Invoke CloudFormation functions
 
 
 ---
